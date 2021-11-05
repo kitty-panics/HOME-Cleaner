@@ -20,7 +20,7 @@ Single_File() {
 Rule_File() {
     echo -e "$1" | awk -F '^RF\\|\\|' '{print $2}' |
     while read -r LINE; do
-        ls "$HOME/$LINE" | cat | while read -r LINE; do
+        ls "$HOME"/`echo -e "$LINE" | sed 's/\ /\\\ /g'` 2>/dev/null | cat | while read -r LINE; do
             rm -rf "$LINE"
         done
     done
