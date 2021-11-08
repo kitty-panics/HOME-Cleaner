@@ -11,9 +11,9 @@ PATH_ENABLE="$HOME/*******/*******/HOME-Cleaner/app.enable"
 # 单一文件 (Single File)
 Single_File() {
     echo -e "$1" | awk -F '^SF\\|\\|' '{print $2}' |
-    while read -r LINE; do
-        if [[ -f "$LINE" ]]; then
-            rm -rf "$HOME/$LINE"
+    while read -r SF; do
+        if [[ -f "$SF" ]]; then
+            rm -rf "$HOME/$SF"
         fi
     done
 }
@@ -21,11 +21,9 @@ Single_File() {
 # 多个规律文件 (Rule File)
 Rule_File() {
     echo -e "$1" | awk -F '^RF\\|\\|' '{print $2}' |
-    while read -r LINE; do
-        ls "$HOME"/`echo -e "$LINE" | sed 's/\ /\\\ /g'` 2>/dev/null | cat | while read -r LINE; do
-            if [[ "$?" == "0" ]]; then
-                rm -rf "$LINE"
-            fi
+    while read -r RF; do
+        ls "$HOME"/`echo -e "$RF" | sed 's/\ /\\\ /g'` 2>/dev/null | cat | while read -r RF2SF; do
+            rm -rf "$RF2SF"
         done
     done
 }
@@ -33,9 +31,9 @@ Rule_File() {
 # 只删目录 (DeleteOnly Dir)
 Deleteonly_Dir() {
     echo -e "$1" | awk -F '^DD\\|\\|' '{print $2}' |
-    while read -r LINE; do
-        if [[ -d "$LINE" ]]; then
-            rm -rf "$HOME/$LINE"
+    while read -r DD; do
+        if [[ -d "$DD" ]]; then
+            rm -rf "$HOME/$DD"
         fi
     done
 }
@@ -43,10 +41,10 @@ Deleteonly_Dir() {
 # 需重建目录 (Recreate Dir)
 Recreate_Dir() {
     echo -e "$1" | awk -F '^RD\\|\\|' '{print $2}' |
-    while read -r LINE; do
-        if [[ -d "$LINE" ]]; then
-            rm -rf "$HOME/$LINE"
-            mkdir -p "$HOME/$LINE"
+    while read -r RD; do
+        if [[ -d "$RD" ]]; then
+            rm -rf "$HOME/$RD"
+            mkdir -p "$HOME/$RD"
         fi
     done
 }
@@ -54,8 +52,8 @@ Recreate_Dir() {
 # Shell 命令 (Shell Command) (主要用于删除历史记录)
 Shell_Command() {
     echo -e "$1" | awk -F '^SC\\|\\|' '{print $2}' |
-    while read -r LINE; do
-        bash -c "$LINE"
+    while read -r SC; do
+        bash -c "$SC" 1>/dev/null 2>&1
     done
 }
 
