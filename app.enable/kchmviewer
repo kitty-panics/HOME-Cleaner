@@ -1,0 +1,3 @@
+DD||.kchmviewer
+SC||sed -i '/^recentFileList=/d' "$HOME/.config/Ulduzsoft/kchmviewer.conf"
+SC||sed -i '/^lastopendir=/d' "$HOME/.config/Ulduzsoft/kchmviewer.conf"
