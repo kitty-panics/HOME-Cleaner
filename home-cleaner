@@ -12,7 +12,9 @@ PATH_ENABLE="$HOME/*******/*******/HOME-Cleaner/app.enable"
 Single_File() {
     echo -e "$1" | awk -F '^SF\\|\\|' '{print $2}' |
     while read -r LINE; do
-        rm -rf "$HOME/$LINE"
+        if [[ -f "$LINE" ]]; then
+            rm -rf "$HOME/$LINE"
+        fi
     done
 }
 
@@ -21,7 +23,9 @@ Rule_File() {
     echo -e "$1" | awk -F '^RF\\|\\|' '{print $2}' |
     while read -r LINE; do
         ls "$HOME"/`echo -e "$LINE" | sed 's/\ /\\\ /g'` 2>/dev/null | cat | while read -r LINE; do
-            rm -rf "$LINE"
+            if [[ "$?" == "0" ]]; then
+                rm -rf "$LINE"
+            fi
         done
     done
 }
@@ -30,7 +34,9 @@ Rule_File() {
 Deleteonly_Dir() {
     echo -e "$1" | awk -F '^DD\\|\\|' '{print $2}' |
     while read -r LINE; do
-        rm -rf "$HOME/$LINE"
+        if [[ -d "$LINE" ]]; then
+            rm -rf "$HOME/$LINE"
+        fi
     done
 }
 
@@ -38,8 +44,10 @@ Deleteonly_Dir() {
 Recreate_Dir() {
     echo -e "$1" | awk -F '^RD\\|\\|' '{print $2}' |
     while read -r LINE; do
-        rm -rf "$HOME/$LINE"
-        mkdir -p "$HOME/$LINE"
+        if [[ -d "$LINE" ]]; then
+            rm -rf "$HOME/$LINE"
+            mkdir -p "$HOME/$LINE"
+        fi
     done
 }
 
