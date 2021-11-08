@@ -58,35 +58,29 @@ Shell_Command() {
 }
 
 # 遍历 APP 规则
-find "$PATH_ENABLE" -maxdepth 1 -type f | while read -r LINE
-do
-    # 单一文件 (Single File)
-    SF_RULE=$(grep '^SF||' "$LINE")
-    if [[ "$?" == "0" ]]; then
-        Single_File "$SF_RULE"
-    fi
-
-    # 多个规律文件 (Rule File)
-    RF_RULE=$(grep '^RF||' "$LINE")
-    if [[ "$?" == "0" ]]; then
-        Rule_File "$RF_RULE"
-    fi
-
-    # 只删目录 (DeleteOnly Dir)
-    DD_RULE=$(grep '^DD||' "$LINE")
-    if [[ "$?" == "0" ]]; then
-        Deleteonly_Dir "$DD_RULE"
-    fi
-
-    # 需重建目录 (Recreate Dir)
-    RD_RULE=$(grep '^RD||' "$LINE")
-    if [[ "$?" == "0" ]]; then
-        Recreate_Dir "$RD_RULE"
-    fi
-
-    # Shell 命令 (Shell Command) (主要用于删除历史记录)
-    SC_RULE=$(grep '^SC||' "$LINE")
-    if [[ "$?" == "0" ]]; then
-        Shell_Command "$SC_RULE"
-    fi
-done
+APP_RULE=$(cat "$PATH_ENABLE"/*)
+# 单一文件 (Single File)
+SF_RULE=$(echo -e "$APP_RULE" | grep '^SF||')
+if [[ "$?" == "0" ]]; then
+    Single_File "$SF_RULE"
+fi
+# 多个规律文件 (Rule File)
+RF_RULE=$(echo -e "$APP_RULE" | grep '^RF||')
+if [[ "$?" == "0" ]]; then
+    Rule_File "$RF_RULE"
+fi
+# 只删目录 (DeleteOnly Dir)
+DD_RULE=$(echo -e "$APP_RULE" | grep '^DD||')
+if [[ "$?" == "0" ]]; then
+    Deleteonly_Dir "$DD_RULE"
+fi
+# 需重建目录 (Recreate Dir)
+RD_RULE=$(echo -e "$APP_RULE" | grep '^RD||')
+if [[ "$?" == "0" ]]; then
+    Recreate_Dir "$RD_RULE"
+fi
+# Shell 命令 (Shell Command) (主要用于删除历史记录)
+SC_RULE=$(echo -e "$APP_RULE" | grep '^SC||')
+if [[ "$?" == "0" ]]; then
+    Shell_Command "$SC_RULE"
+fi
