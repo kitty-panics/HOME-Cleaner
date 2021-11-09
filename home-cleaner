@@ -58,7 +58,7 @@ Shell_Command() {
 }
 
 # 遍历 APP 规则
-APP_RULE=$(cat "$PATH_ENABLE"/*)
+APP_RULE=$(cat `find "$PATH_ENABLE" -maxdepth 1 -type f`)
 # 单一文件 (Single File)
 SF_RULE=$(echo -e "$APP_RULE" | grep '^SF||')
 if [[ "$?" == "0" ]]; then
