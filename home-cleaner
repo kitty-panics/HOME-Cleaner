@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 
 #
-# 清理家目录中的垃圾文件、历史记录
+# 清理家目录中的垃圾文件
 #
 
-# APP Disable/Enable Rule Directory
-PATH_DISABLE="$HOME/*******/*******/HOME-Cleaner/app.disable"
-PATH_ENABLE="$HOME/*******/*******/HOME-Cleaner/app.enable"
+# 规则目录所在的文件夹
+SET_RULE_PATH="$HOME/*******/*******/HOME-Cleaner"
 
-# 单一文件 (Single File)
+# app.disable 规则的目录
+PATH_DISABLE="$SET_RULE_PATH/app.disable"
+# app.enable 规则的目录
+PATH_ENABLE="$SET_RULE_PATH/app.enable"
+
+# 单个文件 (Single File)
 Single_File() {
     echo -e "$1" | awk -F '^SF\\|\\|' '{print $2}' |
     while read -r SF; do
-        if [[ -f "$SF" ]]; then
+        if [[ -f "$HOME/$SF" ]]; then
+            echo -e "Delete: $SF ..."
             rm -rf "$HOME/$SF"
         fi
     done
@@ -22,64 +27,87 @@ Single_File() {
 Rule_File() {
     echo -e "$1" | awk -F '^RF\\|\\|' '{print $2}' |
     while read -r RF; do
-        ls "$HOME"/`echo -e "$RF" | sed 's/\ /\\\ /g'` 2>/dev/null | cat | while read -r RF2SF; do
+        find "$HOME" -type f -regextype findutils-default -regex "$HOME/$RF" | cat | while read -r RF2SF; do
+            #echo -e "Delete: $RF2SF ..."
             rm -rf "$RF2SF"
         done
     done
 }
 
-# 只删目录 (DeleteOnly Dir)
-Deleteonly_Dir() {
-    echo -e "$1" | awk -F '^DD\\|\\|' '{print $2}' |
-    while read -r DD; do
-        if [[ -d "$DD" ]]; then
-            rm -rf "$HOME/$DD"
+# 单个目录 (Single Dir)
+Single_Dir() {
+    echo -e "$1" | awk -F '^SD\\|\\|' '{print $2}' |
+    while read -r SD; do
+        if [[ -d "$HOME/$SD" ]]; then
+            #echo -e "Delete: $SD ..."
+            rm -rf "$HOME/$SD"
         fi
     done
 }
 
-# 需重建目录 (Recreate Dir)
-Recreate_Dir() {
+# 多个规律目录 (Rule Dir)
+Rule_Dir() {
     echo -e "$1" | awk -F '^RD\\|\\|' '{print $2}' |
     while read -r RD; do
-        if [[ -d "$RD" ]]; then
-            rm -rf "$HOME/$RD"
-            mkdir -p "$HOME/$RD"
+        find "$HOME" -type d -regextype findutils-default -regex "$HOME/$RD" | cat | while read -r RD2SD; do
+            #echo -e "Delete: $RD2SD ..."
+            rm -rf "$RD2SD"
+        done
+    done
+}
+
+# 需重建目录 (Make Dir)
+Make_Dir() {
+    echo -e "$1" | awk -F '^MD\\|\\|' '{print $2}' |
+    while read -r MD; do
+        if [[ -d "$HOME/$MD" ]]; then
+            #echo -e "Re-Create: $MD ..."
+            rm -rf "$HOME/$MD"
+            mkdir -p "$HOME/$MD"
         fi
     done
 }
 
-# Shell 命令 (Shell Command) (主要用于删除历史记录)
+# Shell 命令 (Shell Command) (主要用于删除写入在不可删除文件中的历史记录)
 Shell_Command() {
     echo -e "$1" | awk -F '^SC\\|\\|' '{print $2}' |
     while read -r SC; do
+        #echo -e "Execute: $SC ..."
         bash -c "$SC" 1>/dev/null 2>&1
     done
 }
 
 # 遍历 APP 规则
-APP_RULE=$(cat `find "$PATH_ENABLE" -maxdepth 1 -type f` | sed '/^#\ /d;/^$/d')
-# 单一文件 (Single File)
+APP_RULE=$(cat `find "$PATH_ENABLE" -maxdepth 1 -type f` | sed '/^#/d;/^$/d')
+# 文件
+    # 单个文件 (Single File)
 SF_RULE=$(echo -e "$APP_RULE" | grep '^SF||')
 if [[ "$?" == "0" ]]; then
     Single_File "$SF_RULE"
 fi
-# 多个规律文件 (Rule File)
+    # 多个规律文件 (Rule File)
 RF_RULE=$(echo -e "$APP_RULE" | grep '^RF||')
 if [[ "$?" == "0" ]]; then
     Rule_File "$RF_RULE"
 fi
-# 只删目录 (DeleteOnly Dir)
-DD_RULE=$(echo -e "$APP_RULE" | grep '^DD||')
+# 目录
+    # 单个目录 (Single Dir)
+SD_RULE=$(echo -e "$APP_RULE" | grep '^SD||')
 if [[ "$?" == "0" ]]; then
-    Deleteonly_Dir "$DD_RULE"
+    Single_Dir "$SD_RULE"
 fi
-# 需重建目录 (Recreate Dir)
+    # 多个规律目录 (Rule Dir)
 RD_RULE=$(echo -e "$APP_RULE" | grep '^RD||')
 if [[ "$?" == "0" ]]; then
-    Recreate_Dir "$RD_RULE"
+    Rule_Dir "$RD_RULE"
 fi
-# Shell 命令 (Shell Command) (主要用于删除历史记录)
+    # 需重建目录 (Make Dir)
+MD_RULE=$(echo -e "$APP_RULE" | grep '^MD||')
+if [[ "$?" == "0" ]]; then
+    Make_Dir "$MD_RULE"
+fi
+# 记录
+    # Shell 命令 (Shell Command) (主要用于删除写入在不可删除文件中的历史记录)
 SC_RULE=$(echo -e "$APP_RULE" | grep '^SC||')
 if [[ "$?" == "0" ]]; then
     Shell_Command "$SC_RULE"
