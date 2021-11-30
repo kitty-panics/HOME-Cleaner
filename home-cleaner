@@ -35,6 +35,18 @@ Rule_File() {
     done
 }
 
+# 需重建文件 (Make File)
+Make_File() {
+    echo -e "$1" | awk -F '^MF\\|\\|' '{print $2}' |
+    while read -r MF; do
+        if [[ -f "$HOME/$MF" ]]; then
+            #echo -e "[MF] Re-touch: $MF"
+            rm -rf "$HOME/$MF"
+            touch "$HOME/$MF"
+        fi
+    done
+}
+
 # 单个目录 (Single Dir)
 Single_Dir() {
     echo -e "$1" | awk -F '^SD\\|\\|' '{print $2}' |
@@ -63,7 +75,7 @@ Make_Dir() {
     echo -e "$1" | awk -F '^MD\\|\\|' '{print $2}' |
     while read -r MD; do
         if [[ -d "$HOME/$MD" ]]; then
-            #echo -e "[MD] Re-Create: $MD"
+            #echo -e "[MD] Re-mkdir: $MD"
             rm -rf "$HOME/$MD"
             mkdir -p "$HOME/$MD"
         fi
@@ -91,6 +103,11 @@ fi
 RF_RULE=$(echo -e "$APP_RULE" | grep '^RF||')
 if [[ "$?" == "0" ]]; then
     Rule_File "$RF_RULE"
+fi
+    # 需重建文件 (Make File)
+MF_RULE=$(echo -e "$APP_RULE" | grep '^MF||')
+if [[ "$?" == "0" ]]; then
+    Make_File "$MF_RULE"
 fi
 # 目录
     # 单个目录 (Single Dir)
