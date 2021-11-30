@@ -17,8 +17,8 @@ Single_File() {
     echo -e "$1" | awk -F '^SF\\|\\|' '{print $2}' |
     while read -r SF; do
         if [[ -f "$HOME/$SF" ]]; then
-            echo -e "Delete: $SF ..."
-            rm -rf "$HOME/$SF"
+            echo -e "[SF] Delete: $SF"
+            #rm -rf "$HOME/$SF"
         fi
     done
 }
@@ -27,9 +27,10 @@ Single_File() {
 Rule_File() {
     echo -e "$1" | awk -F '^RF\\|\\|' '{print $2}' |
     while read -r RF; do
-        find "$HOME" -type f -regextype findutils-default -regex "$HOME/$RF" | cat | while read -r RF2SF; do
-            #echo -e "Delete: $RF2SF ..."
-            rm -rf "$RF2SF"
+        FMD=$(echo -e "$RF" | tr '/' '\n' | wc -l)
+        find "$HOME" -maxdepth $FMD -type f -regextype findutils-default -regex "$HOME/$RF" | while read -r RF2SF; do
+            echo -e "[RF] Delete: $RF2SF"
+            #rm -rf "$RF2SF"
         done
     done
 }
@@ -39,8 +40,8 @@ Single_Dir() {
     echo -e "$1" | awk -F '^SD\\|\\|' '{print $2}' |
     while read -r SD; do
         if [[ -d "$HOME/$SD" ]]; then
-            #echo -e "Delete: $SD ..."
-            rm -rf "$HOME/$SD"
+            echo -e "[SD] Delete: $SD"
+            #rm -rf "$HOME/$SD"
         fi
     done
 }
@@ -49,9 +50,10 @@ Single_Dir() {
 Rule_Dir() {
     echo -e "$1" | awk -F '^RD\\|\\|' '{print $2}' |
     while read -r RD; do
-        find "$HOME" -type d -regextype findutils-default -regex "$HOME/$RD" | cat | while read -r RD2SD; do
-            #echo -e "Delete: $RD2SD ..."
-            rm -rf "$RD2SD"
+        FMD=$(echo -e "$RD" | tr '/' '\n' | wc -l)
+        find "$HOME" -maxdepth $FMD -type d -regextype findutils-default -regex "$HOME/$RD" | while read -r RD2SD; do
+            echo -e "[RD] Delete: $RD2SD"
+            #rm -rf "$RD2SD"
         done
     done
 }
@@ -61,9 +63,9 @@ Make_Dir() {
     echo -e "$1" | awk -F '^MD\\|\\|' '{print $2}' |
     while read -r MD; do
         if [[ -d "$HOME/$MD" ]]; then
-            #echo -e "Re-Create: $MD ..."
-            rm -rf "$HOME/$MD"
-            mkdir -p "$HOME/$MD"
+            echo -e "[MD] Re-Create: $MD"
+            #rm -rf "$HOME/$MD"
+            #mkdir -p "$HOME/$MD"
         fi
     done
 }
@@ -72,8 +74,8 @@ Make_Dir() {
 Shell_Command() {
     echo -e "$1" | awk -F '^SC\\|\\|' '{print $2}' |
     while read -r SC; do
-        #echo -e "Execute: $SC ..."
-        bash -c "$SC" 1>/dev/null 2>&1
+        echo -e "[SC] Execute: $SC"
+        #bash -c "$SC" 1>/dev/null 2>&1
     done
 }
 
