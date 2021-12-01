@@ -6,10 +6,14 @@
 
 # 规则目录所在的文件夹
 SET_RULE_PATH="$HOME/*******/*******/HOME-Cleaner"
+# find 支持的正则类型
+# findutils-default (默认), ed, emacs, gnu-awk, grep, posix-awk, awk,
+# posix-basic, posix-egrep, egrep, posix-extended, posix-minimal-basic, sed
+FRT="findutils-default" # frt = find regex type
 
-# app.disable 规则的目录
+# 需禁用的规则放至此文件夹
 PATH_DISABLE="$SET_RULE_PATH/app.disable"
-# app.enable 规则的目录
+# 需启用的规则放至此文件夹
 PATH_ENABLE="$SET_RULE_PATH/app.enable"
 
 # 单个文件 (Single File)
@@ -27,8 +31,8 @@ Single_File() {
 Rule_File() {
     echo -e "$1" | awk -F '^RF\\|\\|' '{print $2}' |
     while read -r RF; do
-        FMD=$(echo -e "$RF" | tr '/' '\n' | wc -l)
-        find "$HOME" -maxdepth $FMD -type f -regextype findutils-default -regex "$HOME/$RF" | while read -r RF2SF; do
+        FMD=$(echo -e "$RF" | tr '/' '\n' | wc -l) # fms = find max depth
+        find "$HOME" -maxdepth $FMD -type f -regextype $FRT -regex "$HOME/$RF" | while read -r RF2SF; do
             #echo -e "[RF] Delete: $RF2SF"
             rm -rf "$RF2SF"
         done
@@ -62,8 +66,8 @@ Single_Dir() {
 Rule_Dir() {
     echo -e "$1" | awk -F '^RD\\|\\|' '{print $2}' |
     while read -r RD; do
-        FMD=$(echo -e "$RD" | tr '/' '\n' | wc -l)
-        find "$HOME" -maxdepth $FMD -type d -regextype findutils-default -regex "$HOME/$RD" | while read -r RD2SD; do
+        FMD=$(echo -e "$RD" | tr '/' '\n' | wc -l) # fms = find max depth
+        find "$HOME" -maxdepth $FMD -type d -regextype $FRT -regex "$HOME/$RD" | while read -r RD2SD; do
             #echo -e "[RD] Delete: $RD2SD"
             rm -rf "$RD2SD"
         done
@@ -82,7 +86,7 @@ Make_Dir() {
     done
 }
 
-# Shell 命令 (Shell Command) (主要用于删除写入在不可删除文件中的历史记录)
+# Shell 命令 (Shell Command)
 Shell_Command() {
     echo -e "$1" | awk -F '^SC\\|\\|' '{print $2}' |
     while read -r SC; do
@@ -126,7 +130,7 @@ if [[ "$?" == "0" ]]; then
     Make_Dir "$MD_RULE"
 fi
 # 记录
-    # Shell 命令 (Shell Command) (主要用于删除写入在不可删除文件中的历史记录)
+    # Shell 命令 (Shell Command)
 SC_RULE=$(echo -e "$APP_RULE" | grep '^SC||')
 if [[ "$?" == "0" ]]; then
     Shell_Command "$SC_RULE"
