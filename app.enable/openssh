@@ -1,0 +1,2 @@
+# SSH 访问过主机的公钥记录
+RF||.ssh/known_hosts.*

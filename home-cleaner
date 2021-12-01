@@ -39,7 +39,7 @@ Rule_File() {
     done
 }
 
-# 需重建文件 (Make File)
+# 需重建单个文件 (Make File)
 Make_File() {
     echo -e "$1" | awk -F '^MF\\|\\|' '{print $2}' |
     while read -r MF; do
@@ -74,7 +74,7 @@ Rule_Dir() {
     done
 }
 
-# 需重建目录 (Make Dir)
+# 需重建单个目录 (Make Dir)
 Make_Dir() {
     echo -e "$1" | awk -F '^MD\\|\\|' '{print $2}' |
     while read -r MD; do
@@ -108,7 +108,7 @@ RF_RULE=$(echo -e "$APP_RULE" | grep '^RF||')
 if [[ "$?" == "0" ]]; then
     Rule_File "$RF_RULE"
 fi
-    # 需重建文件 (Make File)
+    # 需重建单个文件 (Make File)
 MF_RULE=$(echo -e "$APP_RULE" | grep '^MF||')
 if [[ "$?" == "0" ]]; then
     Make_File "$MF_RULE"
@@ -124,7 +124,7 @@ RD_RULE=$(echo -e "$APP_RULE" | grep '^RD||')
 if [[ "$?" == "0" ]]; then
     Rule_Dir "$RD_RULE"
 fi
-    # 需重建目录 (Make Dir)
+    # 需重建单个目录 (Make Dir)
 MD_RULE=$(echo -e "$APP_RULE" | grep '^MD||')
 if [[ "$?" == "0" ]]; then
     Make_Dir "$MD_RULE"

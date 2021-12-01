@@ -1,3 +1,4 @@
-DD||.kchmviewer
+# 打开过的文档记录
 SC||sed -i '/^recentFileList=/d' "$HOME/.config/Ulduzsoft/kchmviewer.conf"
-SC||sed -i '/^lastopendir=/d' "$HOME/.config/Ulduzsoft/kchmviewer.conf"
+# 运行 kchmviewer 时自动创建的空目录
+SD||.kchmviewer

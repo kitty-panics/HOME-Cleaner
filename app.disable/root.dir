@@ -1,1 +1,2 @@
+# 清空 root 家目录
 SC||sudo ls -A /root | cat | while read -r LINE; do sudo rm -rf "/root/$LINE"; done

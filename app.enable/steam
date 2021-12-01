@@ -1,2 +1,4 @@
-RF||.local/share/Steam/package/*.zip.*
-DD||.local/share/Steam/ubuntu12_32/steam-runtime.old
+# "在线安装/更新" 时安装包的下载目录
+RF||.local/share/Steam/package/.*.zip..*
+# 旧的 Steam Runtime
+SD||.local/share/Steam/ubuntu12_32/steam-runtime.old
